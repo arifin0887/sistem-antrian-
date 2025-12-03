@@ -48,7 +48,7 @@ class service extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function queue(): HasMany
+    public function queues(): HasMany
     {
         return $this->hasMany(Queue::class, 'service_id', 'id');
     }

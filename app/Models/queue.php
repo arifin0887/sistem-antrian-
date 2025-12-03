@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class queues extends Model
+class queue extends Model
 {
     use HasFactory;
 
@@ -46,6 +46,15 @@ class queues extends Model
     public function service(): BelongsTo
     {
         return $this->belongsTo(Service::class, 'service_id', 'id');
+    }
+    /**
+     * Get the parent that owns the {{ class }}
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
     // /**

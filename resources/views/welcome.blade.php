@@ -1,209 +1,225 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Antrian Rumah Sakit | Sehat Selalu</title>
+    <title>Sistem Antrian Rumah Sakit</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"> 
     
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --primary-color: #0d6efd; /* Blue */
-            --secondary-color: #5ab2ff; /* Light Blue */
-            --bg-color: #f3f7ff;
+            --primary-blue: #1378c9;
+            --secondary-blue: #47b2e4;
+            --bg-light: #f8f9fa;
         }
 
         body {
-            background: var(--bg-color);
-            /* font-family: 'Poppins', sans-serif; */
+            font-family: 'Inter', sans-serif; 
+            color: #212529;
+            background-color: white; 
         }
 
-        /* --- NAVBAR --- */
-        .navbar {
-            transition: background-color 0.3s, box-shadow 0.3s;
+        .navbar-brand {
+            font-weight: 800 !important; 
         }
-        /* Navbar Awal: Transparan */
-        .navbar-transparent {
-            background-color: transparent !important;
-            box-shadow: none !important;
+        .nav-link {
+            font-weight: 500;
+            transition: color 0.2s;
         }
-        .navbar-transparent .navbar-brand,
-        .navbar-transparent .btn-primary {
-             color: white !important; /* Agar teks terlihat di Hero */
-        }
-        
-        /* Navbar Saat Scroll */
-        .navbar-scrolled {
-            background-color: white !important;
-            box-shadow: 0px 5px 15px rgba(0,0,0,0.1) !important;
-        }
-        .navbar-scrolled .navbar-brand {
-             color: var(--primary-color) !important;
+        .nav-link:hover {
+            color: var(--primary-blue) !important;
         }
 
-        /* --- HERO SECTION --- */
-        .hero {
-            min-height: 100vh; /* Menggunakan min-height untuk fleksibilitas */
-            display: flex;
-            align-items: center;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        .hero-section {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
             color: white;
-            padding: 80px 0; /* Padding vertikal */
+            padding: 150px 0 100px 0; 
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); 
         }
-        .hero h1 {
-            font-weight: 700;
-            font-size: clamp(2.5rem, 5vw, 3.5rem); /* Ukuran responsif */
+        .hero-section h1 {
+            font-size: 3.5rem;
+            font-weight: 900;
         }
-        .hero p {
-            font-size: clamp(1rem, 2vw, 1.2rem);
+        .hero-section p {
+            font-size: 1.25rem;
             opacity: 0.9;
         }
 
-        /* --- INFO CARD --- */
-        .info-card {
-            border-radius: 15px;
-            padding: 30px; /* Padding lebih besar */
-            background: white;
-            box-shadow: 0px 5px 20px rgba(0,0,0,0.1);
-            transition: transform 0.3s;
+        .service-card, .card {
+            border-radius: 12px;
+            border: 1px solid #e9ecef;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease-in-out;
         }
-        .info-card:hover {
-            transform: translateY(-5px); /* Efek hover menarik */
+        .service-card:hover, .card:hover {
+            transform: translateY(-8px); 
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
         }
-
-        .info-card img {
-            width: 80px;
-            height: 80px;
+        .service-card h4 {
+            color: var(--primary-blue);
         }
-
-        .btn-light {
-            color: white;
-            background-color: var(--primary-color);
-            border: none;
-            border-radius: 50px;
-            padding: 10px 25px;
-            font-weight: 600;
-            box-shadow: 0px 5px 15px rgba(0,0,0,0.1);
-            transition: background-color 0.3s, color 0.3s;
+        .card i {
+            color: var(--primary-blue); 
+        }
+        .text-primary, .btn-primary {
+            --bs-btn-bg: var(--primary-blue);
+            --bs-btn-border-color: var(--primary-blue);
         }
 
-        /* --- FOOTER --- */
-        footer {
-            border-top: 1px solid #eee;
+        .footer {
+            background: var(--bg-light);
+            padding: 25px 0;
+            border-top: 1px solid #dee2e6;
+            font-size: 0.9rem;
+            color: #6c757d;
         }
     </style>
-
 </head>
+
 <body>
 
-    <header>
-        <nav class="navbar navbar-expand-lg fixed-top navbar-transparent" id="mainNavbar">
-            <div class="container">
-                <a class="navbar-brand fw-bold" href="#">RS Sehat Selalu</a>
-                <div class="d-flex">
-                    <a href="{{'/login'}}" class="btn btn-light shadow-sm fw-bold">Login</a>
-                </div>
-            </div>
-        </nav>
-    </header>
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold text-primary" href="#">
+                <i class="fas fa-hospital me-2"></i> RS Selalu Sehat
+            </a>
 
-    <main>
-        <div class="hero">
-            <div class="container">
-                <div class="row align-items-center">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
 
-                    <div class="col-lg-6 mb-4 mb-lg-0">
-                        <h1 class="display-4">Sistem Antrian Digital untuk Kemudahan Anda</h1>
-                        <p class="mt-4">
-                            Mempermudah proses antrian pasien dengan sistem yang cepat, akurat, dan modern. Dapatkan nomor antrian Anda secara online dan pantau real-time tanpa perlu menunggu lama.
-                        </p>
+            <div class="collapse navbar-collapse" id="navMenu">
 
-                        <a href="{{'/regis'}}" class="btn btn-light btn-lg mt-4 shadow-lg text-primary fw-bold">
-                            Ambil Antrian Sekarang &rarr;
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a href="#layanan" class="nav-link">Layanan</a></li>
+                    <li class="nav-item"><a href="#fitur" class="nav-link">Fitur</a></li>
+
+                    @guest
+                    <li class="nav-item">
+                        <a href="{{ route('login') }}" class="btn btn-primary ms-3">
+                            Login 
                         </a>
-                        <a href="{{'/status'}}" class="btn btn-outline-light btn-lg mt-4 ms-2">
-                             Lihat Status
+                    </li>
+                    @endguest
+
+                    @auth
+                    <li class="nav-item">
+                        <a href="{{ route('queues.index') }}" class="btn btn-success ms-3">
+                            Dashboard
                         </a>
-                    </div>
+                    </li>
+                    @endauth
+                </ul>
 
-                    <div class="col-lg-6 text-center">
-                        <img src="https://cdn-icons-png.flaticon.com/512/2966/2966488.png"
-                             class="img-fluid pulse-animation" width="450" alt="Ilustrasi orang menggunakan aplikasi antrian digital">
-                    </div>
-
-                </div>
             </div>
         </div>
+    </nav>
 
-        {{-- <div class="container my-5 py-5">
-            <h2 class="text-center mb-5 fw-bold">Manfaat Sistem Antrian Kami</h2>
+    <section class="hero-section text-center">
+        <div class="container">
+            <h1 class="display-4 fw-bold">Sistem Antrian Rumah Sakit</h1>
+            <p class="lead mt-3">Ambil antrian dengan mudah, cepat, dan tanpa ribet.</p>
+
+            <div class="mt-5">
+                <a href="{{ route('queues.create') }}" class="btn btn-light btn-lg me-3 px-5 py-3 fw-bold">
+                    Ambil Antrian Sekarang <i class="fas fa-arrow-right ms-2"></i>
+                </a>
+                <a href="{{ route('queues.index') }}" class="btn btn-outline-light btn-lg px-5 py-3 fw-bold">
+                    Lihat Antrian <i class="fas fa-eye ms-2"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section id="layanan" class="py-5">
+        <div class="container">
+            <h2 class="text-center fw-bold mb-5">Layanan Kami</h2>
 
             <div class="row g-4 justify-content-center">
+
+                @foreach(\App\Models\Service::all() as $service)
+                <div class="col-sm-6 col-md-4 col-lg-3">
+                    <div class="card service-card p-4 text-center">
+                        <i class="fas fa-user-md fa-3x text-primary mb-3 mx-auto"></i>
+                        <h4 class="fw-bold">{{ $service->name }}</h4>
+                        <p class="text-muted small">Kode Layanan: <strong>{{ $service->prefix }}</strong></p>
+                        <a href="{{ route('queues.create') }}?service={{ $service->prefix }}" class="btn btn-primary mt-2">
+                            Ambil Antrian
+                        </a>
+                    </div>
+                </div>
+                @endforeach
                 
-                <div class="col-md-6 col-lg-4">
-                    <div class="info-card text-center">
-                        <img src="https://cdn-icons-png.flaticon.com/512/3209/3209265.png" alt="Ikon Antrian Online">
-                        <h5 class="mt-3 fw-bold text-primary">Antrian Digital</h5>
-                        <p class="text-muted">Ambil nomor antrian dari mana saja, kapan saja, melalui perangkat seluler Anda.</p>
+                 @if(empty(\App\Models\Service::all()))
+                    <div class="col-md-4">
+                        <div class="card service-card p-4 text-center">
+                            <i class="fas fa-stethoscope fa-3x text-primary mb-3 mx-auto"></i>
+                            <h4 class="fw-bold">Poli Umum</h4>
+                            <p class="text-muted small">Kode Layanan: <strong>A</strong></p>
+                            <a href="#" class="btn btn-primary mt-2">Ambil Antrian</a>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card service-card p-4 text-center">
+                            <i class="fas fa-tooth fa-3x text-primary mb-3 mx-auto"></i>
+                            <h4 class="fw-bold">Poli Gigi</h4>
+                            <p class="text-muted small">Kode Layanan: <strong>B</strong></p>
+                            <a href="#" class="btn btn-primary mt-2">Ambil Antrian</a>
+                        </div>
+                    </div>
+                @endif
+
+            </div>
+        </div>
+    </section>
+
+    <section id="fitur" class="py-5 bg-light">
+        <div class="container">
+            <h2 class="text-center fw-bold mb-5">Fitur Sistem Antrian</h2>
+
+            <div class="row g-4">
+
+                <div class="col-md-4">
+                    <div class="card p-4 text-center shadow-sm h-100">
+                        <i class="fas fa-qrcode fa-3x mb-3 mx-auto" style="color: var(--primary-blue);"></i>
+                        <h5 class="fw-bold">Nomor Antrian Otomatis</h5>
+                        <p class="text-muted">Setiap layanan menghasilkan kode antrian otomatis (misal: A001, B001).</p>
                     </div>
                 </div>
 
-                <div class="col-md-6 col-lg-4">
-                    <div class="info-card text-center">
-                        <img src="https://cdn-icons-png.flaticon.com/512/1008/1008181.png" alt="Ikon Real-Time Monitoring">
-                        <h5 class="mt-3 fw-bold text-primary">Monitoring Real-Time</h5>
-                        <p class="text-muted">Pantau posisi antrian Anda secara langsung, mengurangi waktu tunggu di lokasi.</p>
+                <div class="col-md-4">
+                    <div class="card p-4 text-center shadow-sm h-100">
+                        <i class="fas fa-users-cog fa-3x mb-3 mx-auto" style="color: #28a745;"></i>
+                        <h5 class="fw-bold">Manajemen User Role</h5>
+                        <p class="text-muted">Admin & Operator memiliki akses fitur yang berbeda untuk keamanan data.</p>
                     </div>
                 </div>
 
-                <div class="col-md-6 col-lg-4">
-                    <div class="info-card text-center">
-                        <img src="https://cdn-icons-png.flaticon.com/512/3208/3208729.png" alt="Ikon Laporan Data">
-                        <h5 class="mt-3 fw-bold text-primary">Laporan Kinerja</h5>
-                        <p class="text-muted">Manajemen mendapatkan data akurat tentang waktu tunggu dan efisiensi pelayanan.</p>
+                <div class="col-md-4">
+                    <div class="card p-4 text-center shadow-sm h-100">
+                        <i class="fas fa-bullhorn fa-3x mb-3 mx-auto" style="color: #ffc107;"></i>
+                        <h5 class="fw-bold">Pemanggilan Real-Time</h5>
+                        <p class="text-muted">Status antrian dapat dipanggil, dilayani, dan diselesaikan langsung oleh operator.</p>
                     </div>
                 </div>
 
             </div>
-        </div> --}}
-
-    </main>
-
-    <footer class="bg-white py-4 text-center">
-        <div class="container">
-            <p class="mb-0 text-muted">© {{ date('Y') }} Rumah Sakit Sehat Selalu. Ditenagai oleh Sistem Antrian Digital.</p>
         </div>
+    </section>
+
+    <footer class="footer text-center">
+        <p class="mb-0">&copy; {{ date('Y') }} Rumah Sakit Selalu Sehat — Sistem Antrian Online</p>
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const mainNavbar = document.getElementById('mainNavbar');
-            const heroSection = document.querySelector('.hero');
-            
-            // Fungsi untuk menentukan apakah navbar harus diubah warnanya
-            function toggleNavbarColor() {
-                // Mendapatkan posisi Hero Section (atau bisa juga menggunakan window.scrollY)
-                const heroHeight = heroSection ? heroSection.offsetHeight : 0;
-                
-                if (window.scrollY > (heroHeight / 3)) { // Ubah warna setelah scroll sepertiga dari hero
-                    mainNavbar.classList.remove('navbar-transparent');
-                    mainNavbar.classList.add('navbar-scrolled');
-                } else {
-                    mainNavbar.classList.remove('navbar-scrolled');
-                    mainNavbar.classList.add('navbar-transparent');
-                }
-            }
-
-            // Panggil sekali saat dimuat
-            toggleNavbarColor(); 
-
-            // Tambahkan event listener saat scrolling
-            window.addEventListener('scroll', toggleNavbarColor);
-        });
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://kit.fontawesome.com/a2d9d5a64b.js" crossorigin="anonymous"></script>
 
 </body>
 </html>

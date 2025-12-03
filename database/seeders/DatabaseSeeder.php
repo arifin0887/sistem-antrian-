@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
             'role' => 'admin',
         ]);
 
+
         User::factory()->create([
             'name' => 'Ripin',
             'email' => 'operator@gmail.com',
@@ -32,17 +33,13 @@ class DatabaseSeeder extends Seeder
         ]);
 
         User::factory()->create([
-            'name' => 'arifin',
-            'email' => 'arifin@gmail.com',
-            'password' => 'password',
-            'role' => 'costumer',
-        ]);
-
-        User::factory()->create([
             'name' => 'budi',
             'email' => 'budi@gmail.com',
             'password' => 'password',
             'role' => 'docter',
         ]);
+
+        $this->call(ServiceSeeder::class);
+        
     }
 }

@@ -18,8 +18,8 @@ return new class extends Migration
             $table->foreignId('service_id')->constrained('services')->onDelete('cascade');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->enum('status', ['waiting', 'in_progress', 'completed'])->default('waiting');
-            $table->timestamp('called_at')->nullable();
-            $table->timestamp('completed_at')->nullable();
+            $table->timestamp('called_at');
+            $table->timestamp('completed_at');
             $table->timestamps();
         });
     }

@@ -21,25 +21,16 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
-
             $user = Auth::user();
-
-            // Arahkan berdasarkan role
             switch ($user->role) {
                 case 'admin':
                     return redirect()->route('admin.dashboard');
 
-                case 'petugas':
-                    return redirect()->route('petugas.dashboard');
-
-                case 'dokter':
-                    return redirect()->route('dokter.dashboard');
-
-                case 'pasien':
-                    return redirect()->route('pasien.dashboard');
+                case 'operator':
+                    return redirect()->route('operator.dashboard');
 
                 default:
-                    return redirect('/'); // fallback
+                    return redirect('/'); 
             }
         }
 
