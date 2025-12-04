@@ -215,7 +215,7 @@
         </div>
 
         <div class="table-wrapper">
-            <table class="table table-striped table-hover mt-3">
+            <table class="table table-striped table-hover mt-3 ">
                 <thead>
                     <tr>
                         <th scope="col">#</th>
@@ -226,7 +226,7 @@
                         <th scope="col">Aksi</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="data-antrian">
                     @forelse($daftarAntrian ?? [] as $a)
                     <tr>
                         <td>{{ $loop->iteration }}</td>
@@ -290,16 +290,13 @@
                     @csrf
                     <div class="modal-body">
 
-                        {{-- Input Nama Pelanggan --}}
                         <div class="mb-3">
                             <label for="customer_name" class="form-label fw-bold">Nama Pelanggan / Pasien</label>
                             <input type="text" name="customer_name" id="customer_name" class="form-control" placeholder="Masukkan nama pasien/pelanggan" required>
                         </div>
                         
-                        {{-- Input ID Layanan --}}
                         <div class="mb-3">
                             <label for="service_id" class="form-label fw-bold">Layanan Tujuan</label>
-                            {{-- Sebaiknya ini berupa <select> dari data layanan (Poli) --}}
                             <input type="number" name="service_id" id="service_id" class="form-control" placeholder="Contoh: 1 (Poli Umum)">
                             <small class="text-muted">Nomor antrian akan digenerate secara otomatis oleh sistem.</small>
                         </div>
@@ -322,6 +319,71 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     
     @stack('scripts')
+
+    @push('scripts')
+
+    <script>
+    function loadAntrian() {
+        fetch("{{ route('queues.json.today') }}")
+            .then(response => response.json())
+            .then(data => {
+                let html = "";
+                let nomor = 1;
+
+                data.forEach(a => {
+                    html += `
+                    <tr>
+                        <td>${nomor++}</td>
+                        <td><b>${a.queue_number}</b></td>
+                        <td>${a.customer_name}</td>
+                        <td>${a.service ? a.service.name : 'N/A'}</td>
+                        <td>
+                            ${
+                                a.status === 'waiting'
+                                    ? '<span class="badge bg-warning">Menunggu</span>'
+                                    : a.status === 'in_progress'
+                                        ? '<span class="badge bg-primary">Dipanggil</span>'
+                                        : '<span class="badge bg-success">Selesai</span>'
+                            }
+                        </td>
+                        <td>
+                            ${
+                                a.status === 'waiting'
+                                ? `
+                                    <form action="/queues/${a.id}/call" method="POST" class="d-inline">
+                                        @csrf
+                                        <button class="btn btn-sm btn-info text-white">
+                                            <i class="fas fa-bullhorn"></i> Panggil
+                                        </button>
+                                    </form>
+                                `
+                                : a.status === 'in_progress'
+                                ? `
+                                    <form action="/queues/${a.id}/done" method="POST" class="d-inline">
+                                        @csrf
+                                        <button class="btn btn-sm btn-success">
+                                            <i class="fas fa-check"></i> Selesai
+                                        </button>
+                                    </form>
+                                `
+                                : ``
+                            }
+                        </td>
+                    </tr>
+                    `;
+                });
+
+                document.getElementById("data-antrian").innerHTML = html;
+            });
+    }
+
+    // 🔄 Jalankan setiap 3 detik
+    setInterval(loadAntrian, 3000);
+
+    // Jalankan pertama kali
+    loadAntrian();
+    </script>
+    @endpush
 
 </body>
 </html>

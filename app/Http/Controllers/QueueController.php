@@ -70,4 +70,15 @@ class QueueController extends Controller
         $queue->save();
         return back()->with('success', 'Status berhasil diperbarui');
     }
+
+    public function jsonToday()
+    {
+        $antrian = Queue::with('service')
+            ->whereDate('created_at', today())
+            ->orderBy('queue_number', 'asc')
+            ->get();
+
+        return response()->json($antrian);
+    }
+
 }

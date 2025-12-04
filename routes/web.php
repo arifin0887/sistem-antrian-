@@ -60,4 +60,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/operator/dashboard', [OperatorDashboardController::class, 'index'])
     ->name('operator.dashboard');
 
+    Route::get('/queues/json/today', [QueueController::class, 'jsonToday'])
+    ->name('queues.json.today');
+
 });
