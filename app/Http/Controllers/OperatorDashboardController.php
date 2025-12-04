@@ -12,10 +12,13 @@ class OperatorDashboardController extends Controller
     {
         $totalPasien = Queue::count();
         $totalDocter = User::where('role', 'docter')->count();
-        $antrianHariIni = Queue::whereDate('created_at', today())->count();
+        $antrianHariIni = Queue::whereDate('created_at', today())
+            ->whereIn('status', ['waiting', 'in_progress']) 
+            ->count();
         $totalPoli = Service::count();
         $daftarAntrian = Queue::with('service')
-            ->whereDate('created_at', today())
+            ->whereIn('status', ['waiting', 'in_progress']) 
+            ->whereDate('created_at', today()) 
             ->orderBy('created_at', 'ASC')
             ->get();
 

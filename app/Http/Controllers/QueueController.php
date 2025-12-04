@@ -12,7 +12,7 @@ class QueueController extends Controller
     public function index()
     {
         $queues = Queue::with('service')->orderBy('created_at', 'DESC')->get();
-        return view('queues.index', compact('queues'));
+        return view('operator.dashboard', compact('queues'));
     }
 
     public function create()
@@ -48,7 +48,7 @@ class QueueController extends Controller
             'service_id' => $request->service_id,
             'user_id' => Auth::id(),
         ]);
-        return redirect()->route('queues.index')->with('success', 'Antrian berhasil ditambahkan');
+        return redirect()->route('operator.dashboard')->with('success', 'Antrian berhasil ditambahkan');
     }
 
     public function show($id)

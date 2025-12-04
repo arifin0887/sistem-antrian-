@@ -298,7 +298,7 @@
                         
                         {{-- Input ID Layanan --}}
                         <div class="mb-3">
-                            <label for="service_id" class="form-label fw-bold">Layanan Tujuan (service_id)</label>
+                            <label for="service_id" class="form-label fw-bold">Layanan Tujuan</label>
                             {{-- Sebaiknya ini berupa <select> dari data layanan (Poli) --}}
                             <input type="number" name="service_id" id="service_id" class="form-control" placeholder="Contoh: 1 (Poli Umum)">
                             <small class="text-muted">Nomor antrian akan digenerate secara otomatis oleh sistem.</small>
@@ -311,7 +311,7 @@
                             <i class="fas fa-times-circle me-1"></i> Batal
                         </button>
                         <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save me-1"></i> Generate & Simpan Antrian
+                            <i class="fas fa-save me-1"></i> Simpan Antrian
                         </button>
                     </div>
                 </form>

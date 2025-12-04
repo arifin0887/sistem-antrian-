@@ -57,4 +57,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/queues/{id}/call', [QueueProcessController::class, 'call'])->name('queues.call');
     Route::post('/queues/{id}/done', [QueueProcessController::class, 'done'])->name('queues.done');
 
+    Route::get('/operator/dashboard', [OperatorDashboardController::class, 'index'])
+    ->name('operator.dashboard');
+
 });
