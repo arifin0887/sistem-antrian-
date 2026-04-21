@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Dashboard Operator | RS Selalu Sehat</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -174,12 +175,12 @@
             <ul class="nav nav-tabs mb-4" id="operatorTabs" role="tablist">
                 <li class="nav-item" role="presentation">
                     <button class="nav-link active fw-bold" id="aktif-tab" data-bs-toggle="tab" data-bs-target="#aktif" type="button">
-                        <i class="fas fa-list me-1"></i> Aktif (<span id="count-aktif">0</span>)
+                        <i class="fas fa-list me-1"></i> Aktif (<span id="count-aktif">{{ $daftarAntrian->count() }}</span>)
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link fw-bold" id="selesai-tab" data-bs-toggle="tab" data-bs-target="#selesai" type="button">
-                        <i class="fas fa-check-double me-1"></i> Selesai (<span id="count-selesai">0</span>)
+                        <i class="fas fa-check-double me-1"></i> Selesai ({{ $daftarAntrianSelesai->count() }})
                     </button>
                 </li>
             </ul>
@@ -199,12 +200,58 @@
                                     <th>Kendali</th>
                                 </tr>
                             </thead>
-<tbody id="data-aktif">
-                                <tr>
-                                    <td colspan="6" class="text-center py-5 text-muted">
-                                        <i class="fas fa-inbox fa-2x mb-3 opacity-50"></i><br>Tidak ada data
-                                    </td>
-                                </tr>
+                            <tbody id="data-aktif">
+                                @forelse($daftarAntrian as $queue)
+                                    {{-- Baris ini memastikan jika ada data 'completed' nyasar, tidak akan tampil di tab Aktif --}}
+                                    @if($queue->status !== 'completed')
+                                    <tr>
+                                        <td>{{ $loop->iteration }}</td>
+                                        <td><strong>{{ $queue->queue_number }}</strong></td>
+                                        <td>
+                                            {{ $queue->customer_name }}
+                                            <br><small class="text-muted">#{{ $queue->id }}</small>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-light text-dark">{{ $queue->service->name ?? 'Umum' }}</span>
+                                        </td>
+                                        <td>
+                                            @php
+                                                $statusClass = match($queue->status) {
+                                                    'waiting' => 'badge-waiting',
+                                                    'in_progress' => 'badge-active',
+                                                    default => 'bg-secondary'
+                                                };
+                                                $statusText = match($queue->status) {
+                                                    'waiting' => 'Menunggu',
+                                                    'in_progress' => 'Dipanggil',
+                                                    default => 'Proses'
+                                                };
+                                            @endphp
+                                            <span class="status-badge {{ $statusClass }}">{{ $statusText }}</span>
+                                        </td>
+                                        <td>
+                                            @if($queue->status == 'waiting')
+                                                <form method="POST" action="/queues/{{ $queue->id }}/call" class="d-inline">
+                                                    @csrf
+                                                    <button class="btn btn-sm btn-primary btn-action">
+                                                        <i class="fas fa-bullhorn"></i> Panggil
+                                                    </button>
+                                                </form>
+                                            @elseif($queue->status == 'in_progress')
+                                                <span class="badge bg-warning text-dark">
+                                                    <i class="fas fa-stethoscope me-1"></i> Pemeriksaan
+                                                </span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                    @endif
+                                @empty
+                                    <tr>
+                                        <td colspan="6" class="text-center py-5 text-muted">
+                                            <i class="fas fa-inbox fa-2x mb-3 opacity-50"></i><br>Tidak ada antrian aktif
+                                        </td>
+                                    </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
@@ -224,12 +271,35 @@
                                     <th>Resume</th>
                                 </tr>
                             </thead>
-<tbody id="data-selesai">
+                            <tbody id="data-selesai">
+                                @forelse($daftarAntrianSelesai as $queue)
+                                <tr>
+                                    <td>{{ $loop->iteration }}</td>
+                                    <td><strong class="text-success">{{ $queue->queue_number }}</strong></td>
+                                    <td>{{ $queue->customer_name }}<br><small class="text-muted">#{{ $queue->id }}</small></td>
+                                    <td><span class="badge bg-light text-dark">{{ $queue->service->name ?? 'Umum' }}</span></td>
+                                    <td>{{ $queue->medicalRecord->doctor->name ?? 'N/A' }}</td>
+                                    <td>
+                                        @php
+                                            $recordData = $queue->medicalRecord ? $queue->medicalRecord->toArray() : [];
+                                            $recordJson = json_encode($recordData);
+                                        @endphp
+                                        @if($queue->medicalRecord)
+                                            <button class="btn btn-sm btn-info btn-action" data-bs-toggle="modal" data-bs-target="#resumeModal" onclick="showResume({{ $recordJson }})">
+                                                <i class="fas fa-eye"></i> Resume
+                                            </button>
+                                        @else
+                                            <span class="text-muted">No Resume</span>
+                                        @endif
+                                    </td>
+                                </tr>
+                                @empty
                                 <tr>
                                     <td colspan="6" class="text-center py-5 text-muted">
                                         <i class="fas fa-check-circle fa-2x mb-3 opacity-50"></i><br>Tidak ada data selesai
                                     </td>
                                 </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
@@ -290,7 +360,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body" id="resumeContent">
-                    Loading...
+                    Pilih resume dari tabel untuk melihat detail medical record.
                 </div>
             </div>
         </div>
@@ -298,7 +368,11 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        let allData = [];
+        // 1. Ambil token CSRF sekali saja di awal
+        const getCsrfToken = () => {
+            const meta = document.querySelector('meta[name="csrf-token"]');
+            return meta ? meta.getAttribute('content') : '';
+        };
 
         function getStatusBadge(status) {
             switch(status) {
@@ -311,22 +385,30 @@
 
         function renderTable(containerId, data, isSelesai = false) {
             let html = '';
-            if (data.length === 0) {
-                html = '<tr><td colspan="' + (isSelesai ? '6' : '6') + '" class="text-center py-5 text-muted"><i class="fas fa-inbox fa-2x mb-3 opacity-50"></i><br>Tidak ada data</td></tr>';
+            const token = getCsrfToken();
+
+            if (!data || data.length === 0) {
+                html = `<tr><td colspan="6" class="text-center py-5 text-muted">
+                            <i class="fas fa-inbox fa-2x mb-3 opacity-50"></i><br>Tidak ada data
+                        </td></tr>`;
             } else {
                 data.forEach((queue, index) => {
                     if (isSelesai) {
+                        // Gunakan data-attribute untuk passing JSON agar lebih aman dari XSS/Syntax Error
+                        const recordStr = JSON.stringify(queue.medical_record || {});
                         html += `
                             <tr>
                                 <td>${index + 1}</td>
                                 <td><strong class="text-success">${queue.queue_number}</strong></td>
                                 <td>${queue.customer_name}<br><small class="text-muted">#${queue.id}</small></td>
                                 <td><span class="badge bg-light text-dark">${queue.service?.name || 'Umum'}</span></td>
-                                <td>${queue.medicalRecord?.doctor?.name || 'N/A'}</td>
+                                <td>${queue.medical_record?.doctor?.name || 'N/A'}</td>
                                 <td>
-                                    ${queue.medicalRecord ? 
-                                        '<button class="btn btn-sm btn-info" onclick="showResume(' + JSON.stringify(queue.medicalRecord || {}) + ')"><i class="fas fa-eye"></i> Resume</button>' 
-                                        : '<span class="text-muted">No Resume</span>'
+                                    ${queue.medical_record ? 
+                                        `<button class="btn btn-sm btn-info btn-action" 
+                                            onclick='showResume(${recordStr})'>
+                                            <i class="fas fa-eye"></i> Resume
+                                        </button>` : '<span class="text-muted">No Resume</span>'
                                     }
                                 </td>
                             </tr>`;
@@ -340,11 +422,11 @@
                                 <td>${getStatusBadge(queue.status)}</td>
                                 <td>
                                     ${queue.status === 'waiting' ? 
-                                        '<form method="POST" action="/queues/' + queue.id + '/call" class="d-inline">
-                                            @csrf
-                                            <button class="btn btn-sm btn-primary"><i class="fas fa-bullhorn"></i> Panggil</button>
-                                        </form>' : 
-                                        (queue.status === 'in_progress' ? '<span class="badge bg-warning">Menunggu Dokter</span>' : '')
+                                        `<form method="POST" action="/queues/${queue.id}/call" class="d-inline">
+                                            <input type="hidden" name="_token" value="${token}">
+                                            <button class="btn btn-sm btn-primary btn-action"><i class="fas fa-bullhorn"></i> Panggil</button>
+                                        </form>` : 
+                                        (queue.status === 'in_progress' ? '<span class="badge bg-warning text-dark">Sedang Diperiksa</span>' : '-')
                                     }
                                 </td>
                             </tr>`;
@@ -355,49 +437,90 @@
         }
 
         function showResume(record) {
-            let html = '<div class="row g-3">';
-            if (record.anamnesis) html += '<div class="col-12"><strong>Anamnesis:</strong> ' + record.anamnesis + '</div>';
-            if (record.physical_exam) html += '<div class="col-md-6"><strong>Fisik:</strong> ' + record.physical_exam + '</div>';
-            if (record.diagnosis) html += '<div class="col-md-6"><strong>Diagnosis:</strong> ' + record.diagnosis + '</div>';
-            if (record.therapy) html += '<div class="col-12"><strong>Terapi:</strong> ' + record.therapy + '</div>';
-            if (record.notes) html += '<div class="col-12"><strong>Catatan:</strong> ' + record.notes + '</div>';
-            html += '<div class="col-12 mt-3 pt-3 border-top"><small class="text-muted">Oleh: ' + (record.doctor?.name || 'Dokter') + ' | ' + new Date(record.created_at).toLocaleString('id-ID') + '</small></div>';
-            html += '</div>';
+            if (!record || Object.keys(record).length === 0) return;
+
+            let html = `
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="fw-bold small text-muted">ANAMNESIS</label>
+                        <p class="border-bottom pb-2">${record.anamnesis || '-'}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="fw-bold small text-muted">PEMERIKSAAN FISIK</label>
+                        <p class="border-bottom pb-2">${record.physical_exam || '-'}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="fw-bold small text-info">DIAGNOSIS</label>
+                        <p class="border-bottom pb-2 fw-bold text-dark">${record.diagnosis || '-'}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="fw-bold small text-success">TERAPI</label>
+                        <p class="border-bottom pb-2 fw-bold text-dark">${record.therapy || '-'}</p>
+                    </div>
+                    <div class="col-12">
+                        <label class="fw-bold small text-muted">CATATAN</label>
+                        <div class="p-3 bg-light rounded">${record.notes || 'Tidak ada catatan.'}</div>
+                    </div>
+                    <div class="col-12 mt-3 pt-2 border-top">
+                        <small class="text-muted">
+                            <i class="fas fa-user-md me-1"></i> Dokter: ${record.doctor?.name || 'N/A'} 
+                            <span class="mx-2">|</span>
+                            <i class="fas fa-calendar-alt me-1"></i> ${new Date(record.created_at).toLocaleString('id-ID')}
+                        </small>
+                    </div>
+                </div>`;
+            
             document.getElementById('resumeContent').innerHTML = html;
-            new bootstrap.Modal(document.getElementById('resumeModal')).show();
+            // Trigger modal (Gunakan selector ID agar konsisten)
+            const modalElement = document.getElementById('resumeModal');
+            const modalInstance = bootstrap.Modal.getOrCreateInstance(modalElement);
+            modalInstance.show();
         }
 
-        function loadData() {
-            fetch("{{ route('queues.json.today') }}")
-                .then(r => r.json())
-                .then(data => {
-                    allData = data;
-                    const aktif = data.filter(q => ['waiting', 'in_progress'].includes(q.status));
-                    const selesai = data.filter(q => q.status === 'completed');
-                    document.getElementById('count-aktif').textContent = aktif.length;
-                    document.getElementById('count-selesai').textContent = selesai.length;
-                    renderTable('data-aktif', aktif, false);
-                    renderTable('data-selesai', selesai, true);
-                })
-                .catch(() => {
-                    ['data-aktif', 'data-selesai'].forEach(id => {
-                        document.getElementById(id).innerHTML = '<tr><td colspan="6" class="text-center text-danger py-4">Gagal memuat data</td></tr>';
-                    });
+        async function loadData() {
+            try {
+                // Gunakan path absolut atau helper route Laravel jika di dalam file .blade
+                const [aktifRes, selesaiRes] = await Promise.all([
+                    fetch("{{ route('queues.json.today') }}"),
+                    fetch("{{ route('queues.completed') }}")
+                ]);
+
+                if (!aktifRes.ok || !selesaiRes.ok) throw new Error('Network response was not ok');
+
+                const aktifData = await aktifRes.json();
+                const selesaiData = await selesaiRes.json();
+
+                document.getElementById('count-aktif').textContent = aktifData.length;
+                // Update count selesai jika ada ID-nya di HTML
+                const countSelesai = document.querySelector('#selesai-tab span');
+                if(countSelesai) countSelesai.textContent = selesaiData.length;
+
+                renderTable('data-aktif', aktifData, false);
+                renderTable('data-selesai', selesaiData, true);
+            } catch (err) {
+                console.error('Load error:', err);
+                // Hindari error jika elemen tidak ditemukan
+                ['data-aktif', 'data-selesai'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if(el) el.innerHTML = '<tr><td colspan="6" class="text-center text-danger py-4">Gagal sinkronisasi data</td></tr>';
                 });
+            }
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             loadData();
+            // Polling setiap 5 detik
             setInterval(loadData, 5000);
 
-            // Tab switch
-            document.querySelectorAll('[data-bs-toggle="tab"]').forEach(tab => {
-                tab.addEventListener('shown.bs.tab', () => loadData());
+            // Refresh data saat tab berpindah
+            const tabs = document.querySelectorAll('[data-bs-toggle="tab"]');
+            tabs.forEach(tab => {
+                tab.addEventListener('shown.bs.tab', loadData);
             });
         });
-    </script>
+</script>
 
-    <div class="modal fade" id="resumeModal" tabindex="-1">
+    {{-- <div class="modal fade" id="resumeModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
@@ -411,7 +534,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
+
 </body>
 </html>
-

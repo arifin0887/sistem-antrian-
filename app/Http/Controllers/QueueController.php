@@ -72,7 +72,7 @@ class QueueController extends Controller
         return back()->with('success', 'Status berhasil diperbarui');
     }
 
-    public function jsonToday()
+public function jsonToday()
     {
         $antrian = Queue::with(['service', 'medicalRecord.doctor'])
             ->whereDate('created_at', Carbon::today())
@@ -80,6 +80,17 @@ class QueueController extends Controller
             ->get();
 
         return response()->json($antrian);
+    }
+    
+    public function jsonCompleted()
+    {
+        $completed = Queue::with(['service', 'medicalRecord.doctor'])
+            ->whereDate('created_at', Carbon::today())
+            ->where('status', 'completed')
+            ->orderBy('completed_at', 'desc')
+            ->get();
+
+        return response()->json($completed);
     }
 
 }

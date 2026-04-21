@@ -23,6 +23,11 @@ class OperatorDashboardController extends Controller
             ->whereDate('created_at', Carbon::today()) 
             ->orderBy('created_at', 'ASC')
             ->get();
+        $daftarAntrianSelesai = Queue::with(['service', 'medicalRecord.doctor'])
+            ->where('status', 'completed') 
+            ->whereDate('created_at', Carbon::today()) 
+            ->orderBy('completed_at', 'desc')
+            ->get();
 
         return view('operator.dashboard', compact(
             'totalPasien',
@@ -30,6 +35,7 @@ class OperatorDashboardController extends Controller
             'antrianHariIni',
             'totalPoli',
             'daftarAntrian',
+            'daftarAntrianSelesai',
             'services'
         ));
     }

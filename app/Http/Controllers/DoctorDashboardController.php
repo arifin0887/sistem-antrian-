@@ -86,5 +86,11 @@ class DoctorDashboardController extends Controller
         
         return redirect()->route('dokter.dashboard')->with('success', 'Antrian ' . $nextQueue->queue_number . ' (' . $nextQueue->customer_name . ') telah dipanggil.');
     }
+
+    public function getMedicalRecord($id)
+    {
+        $record = \App\Models\MedicalRecord::findOrFail($id);
+        return response()->json($record);
+    }
 }
 

@@ -34,15 +34,19 @@ Route::middleware('auth')->group(function () {
     
     // API JSON untuk update real-time di Dashboard Operator
     Route::get('/queues-json-today', [QueueController::class, 'jsonToday'])->name('queues.json.today');
+    Route::get('/queues-completed', [QueueController::class, 'jsonCompleted'])->name('queues.completed');
 
     // Proses Antrian (Panggil, Selesai, Update Status)
     Route::post('/queues/{id}/call', [QueueProcessController::class, 'call'])->name('queues.call');
     Route::post('/queues/{id}/done', [QueueProcessController::class, 'done'])->name('queues.done');
     Route::post('/queues/{id}/status', [QueueController::class, 'updateStatus'])->name('queues.updateStatus');
 
-// Rute Khusus Dokter (Simpan Rekam Medis & Tunda)
+    // Rute Khusus Dokter (Simpan Rekam Medis & Tunda)
     Route::post('/dokter/save-record/{id}', [DoctorDashboardController::class, 'storeMedicalRecord'])->name('dokter.save-record');
     Route::post('/dokter/skip/{id}', [DoctorDashboardController::class, 'skipPatient'])->name('dokter.skip');
     Route::post('/dokter/call-next', [DoctorDashboardController::class, 'callNext'])->name('dokter.call-next');
+
+    //
+    Route::get('/medical-record/{id}', [DoctorDashboardController::class, 'getMedicalRecord']);
 
 });
