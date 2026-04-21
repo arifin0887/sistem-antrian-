@@ -6,6 +6,7 @@ use App\Models\Queue;
 use App\Models\Service;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class QueueController extends Controller
 {
@@ -73,8 +74,8 @@ class QueueController extends Controller
 
     public function jsonToday()
     {
-        $antrian = Queue::with('service')
-            ->whereDate('created_at', today())
+        $antrian = Queue::with(['service', 'medicalRecord.doctor'])
+            ->whereDate('created_at', Carbon::today())
             ->orderBy('queue_number', 'asc')
             ->get();
 
@@ -82,3 +83,4 @@ class QueueController extends Controller
     }
 
 }
+

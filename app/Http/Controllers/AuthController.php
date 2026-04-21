@@ -22,26 +22,28 @@ class AuthController extends Controller
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
             $user = Auth::user();
+
+            // Logic Pengalihan Role
             switch ($user->role) {
                 case 'admin':
                     return redirect()->route('admin.dashboard');
-
                 case 'operator':
                     return redirect()->route('operator.dashboard');
-
+                case 'docter': // Sesuai ENUM database Anda
+                    return redirect()->route('dokter.dashboard');
                 default:
-                    return redirect('/'); 
+                    return redirect('/');
             }
         }
 
         return back()->withErrors([
             'email' => 'Email atau password salah!',
-        ]);
+        ])->onlyInput('email');
     }
 
     public function logout(Request $request)
     {
-        auth()->logout();
+        Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
         return redirect('/');

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Queue;
 use App\Models\Service;
 use App\Models\User;
+use Carbon\Carbon;
 
 class OperatorDashboardController extends Controller
 {
@@ -12,13 +13,14 @@ class OperatorDashboardController extends Controller
     {
         $totalPasien = Queue::count();
         $totalDocter = User::where('role', 'docter')->count();
-        $antrianHariIni = Queue::whereDate('created_at', today())
+        $antrianHariIni = Queue::whereDate('created_at', Carbon::today())
             ->whereIn('status', ['waiting', 'in_progress']) 
             ->count();
         $totalPoli = Service::count();
+        $services = Service::all();
         $daftarAntrian = Queue::with('service')
             ->whereIn('status', ['waiting', 'in_progress']) 
-            ->whereDate('created_at', today()) 
+            ->whereDate('created_at', Carbon::today()) 
             ->orderBy('created_at', 'ASC')
             ->get();
 
@@ -27,7 +29,9 @@ class OperatorDashboardController extends Controller
             'totalDocter',
             'antrianHariIni',
             'totalPoli',
-            'daftarAntrian'
+            'daftarAntrian',
+            'services'
         ));
     }
 }
+

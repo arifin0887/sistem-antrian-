@@ -15,7 +15,7 @@ class queue extends Model
      * The attributes that are mass assignable.
      * @var array<int, string>
      */
-    protected $fillable = [
+protected $fillable = [
         'service_id',
         'queue_number',
         'status',
@@ -52,9 +52,19 @@ class queue extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function user(): BelongsTo
+public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+
+    public function medicalRecords(): HasMany
+    {
+        return $this->hasMany(MedicalRecord::class);
+    }
+
+public function medicalRecord(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(MedicalRecord::class)->latest();
     }
 
     // /**
